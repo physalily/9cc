@@ -76,6 +76,15 @@ void tokenize(char *p)
 	tokens[i].input = p;
 }
 
+Node *new_node(int ty, Node *lhs, Node *rhs)
+{
+	Node *node = malloc(sizeof(Node));
+	node->ty = ty;
+	node->lhs = lhs;
+	node->rhs = rhs;
+	return node;
+}
+
 //function to report an error
 void error(int i)
 {
