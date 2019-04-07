@@ -11,11 +11,27 @@ enum
 };
 
 //token type
-typedef struct{
+typedef struct
+{
 	int ty;		//token type
 	int val;	//if ty is TK_NUM, that value
 	char *input;	//token strings(use for error message
 } Token;
+
+//value of node type
+enum
+{
+	ND_NUM = 256,	//integer node type
+};
+
+//Node type
+typedef struct Node
+{
+	int ty;			//operater or ND_NUM
+	struct Node *lhs;	//left-hand side
+	struct Node *rhs;	//right-hand side
+	int val;		//use if ty is ND_NUM
+} Node;
 
 //store tokenized result tokenized string in this array
 //No more than 100 tokens shall come
