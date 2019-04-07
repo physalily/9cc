@@ -36,6 +36,7 @@ typedef struct Node
 //store tokenized result tokenized string in this array
 //No more than 100 tokens shall come
 Token tokens[100];
+int pos = 0; 	//tokens index number
 
 //divide the string pointed to by p into tokens and store them in tokens
 void tokenize(char *p)
@@ -91,6 +92,14 @@ Node *new_node_num(int val)
 	node->ty = ND_NUM;
 	node->val = val;
 	return node;
+}
+
+int consume(int ty)
+{
+	if(tokens[pos].ty != ty)
+		return 0;
+	pos++;
+	return 1;
 }
 
 //function to report an error
