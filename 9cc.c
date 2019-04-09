@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 //value of token type
 enum
 {
@@ -94,6 +95,33 @@ Node *new_node_num(int val)
 	return node;
 }
 
+Node *term()
+{
+	//if(consume('('))
+	//{
+	//	Node *node = add();
+	//	if(!consume(')'))
+	//		error("nothing parenthesis pair: %s", tokens[pos].input);
+	//	return node;
+	//}
+
+	if(tokens[pos].ty == TK_NUM)
+		return new_node_num(tokens[pos++].val);
+
+	error("tokens is nor number or open parenthesis: %s",tokens[pos].input);
+}
+
+Node *add()
+{
+	Node *node = term();
+	
+	if(consume('+'))
+		node = new_node('+', node, term());
+	if(consume('-'))
+		node = new_node('-', node, term());
+	return node;
+}
+
 int consume(int ty)
 {
 	if(tokens[pos].ty != ty)
@@ -155,6 +183,7 @@ int main(int argc, char **argv)
 	
 	//tokenize...
 	tokenize(argv[1]);
+	Node *node = add();
 
 	//output front part of assembly
 	printf(".intel_syntax noprefix\n");
@@ -165,36 +194,10 @@ int main(int argc, char **argv)
 	//and output first mov instruction
 	if(tokens[0].ty != TK_NUM)
 		error(0);	
-	printf("	mov rax, %d\n", tokens[0].val);
-	
-	//'+ <numver>' or '- <number>' tokens consumpition
-	//ad output assembly
-	int i = 1;
-	while(tokens[i].ty != TK_EOF)
-	{
-		if(tokens[i].ty == '+')
-		{
-			i++;
-			if(tokens[i].ty != TK_NUM)
-				error(i);
-			printf("	add rax, %d\n", tokens[i].val);
-			i++;
-			continue;
-		}
-		
-		if(tokens[i].ty = '-')
-		{
-			i++;
-			if(tokens[i].ty != TK_NUM)
-				error(i);
-			printf("	sub rax, %d\n", tokens[i].val);
-			i++;
-			continue;
-		}
 
-		error(i);
-	}
+	gen(node);
 
+	printf("	pop rax\n");
 	printf("	ret\n");
 	return 0;
 }
