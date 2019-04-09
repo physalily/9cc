@@ -52,7 +52,7 @@ void tokenize(char *p)
 			continue;
 		}
 
-		if(*p == '+' || *p == '-')
+		if(*p == '+' || *p == '-' || *p == '*' || *p == '/')
 		{
 			tokens[i].ty = *p;
 			tokens[i].input = p;
@@ -111,15 +111,34 @@ Node *term()
 	error("tokens is nor number or open parenthesis: %s",tokens[pos].input);
 }
 
-Node *add()
+Node *mul()
 {
 	Node *node = term();
 	
-	if(consume('+'))
-		node = new_node('+', node, term());
-	if(consume('-'))
-		node = new_node('-', node, term());
-	return node;
+	for(;;)
+	{
+		if(consume('*'))
+			node = new_node('*', node, term());
+		else if(consume('/'))
+			node = new_node('/', node, term());
+		else
+			return node;
+	}
+}
+
+Node *add()
+{
+	Node *node = mul();
+	
+	for(;;)
+	{
+		if(consume('+'))
+			node = new_node('+', node, mul());
+		if(consume('-'))
+			node = new_node('-', node, mul());
+		else
+			return node;
+	}
 }
 
 int consume(int ty)
