@@ -52,7 +52,7 @@ void tokenize(char *p)
 			continue;
 		}
 
-		if(*p == '+' || *p == '-' || *p == '*' || *p == '/')
+		if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')')
 		{
 			tokens[i].ty = *p;
 			tokens[i].input = p;
@@ -95,15 +95,23 @@ Node *new_node_num(int val)
 	return node;
 }
 
+//prototype def
+Node *term();
+Node *mul();
+Node *add();
+int cousume();
+void error();
+
+
 Node *term()
 {
-	//if(consume('('))
-	//{
-	//	Node *node = add();
-	//	if(!consume(')'))
-	//		error("nothing parenthesis pair: %s", tokens[pos].input);
-	//	return node;
-	//}
+	if(consume('('))
+	{
+		Node *node = add();
+		if(!consume(')'))
+			error("nothing parenthesis pair: %s", tokens[pos].input);
+		return node;
+	}
 
 	if(tokens[pos].ty == TK_NUM)
 		return new_node_num(tokens[pos++].val);
@@ -196,7 +204,7 @@ int main(int argc, char **argv)
 {
 	if(argc != 2)
 	{
-		fprintf(stderr, "Number of incorrect arguments");
+		fprintf(stderr, "Number of incorrect arguments\n");
 		return 1;
 	}
 	
