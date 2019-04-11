@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+//#include "9cc.h"
 
 //value of token type
 enum
@@ -34,10 +34,37 @@ typedef struct Node
 	int val;		//use if ty is ND_NUM
 } Node;
 
+typedef struct 
+{
+	void **data;	//The data itself
+	int capacity;	//baffer size
+	int len;	//individual element(already added)
+} Vector;
+
+
 //store tokenized result tokenized string in this array
 //No more than 100 tokens shall come
 Token tokens[100];
 int pos = 0; 	//tokens index number
+
+Vector *new_vector()
+{
+	Vector *vec = malloc(sizeof(Vector));
+	vec->data = malloc(sizeof(void *) * 16);
+	vec->capacity = 16;
+	vec->len = 0;
+	return vec;
+}
+
+void vec_push(Vector *vec, void *elem)
+{
+	if(vec->capacity == vec->len)
+	{
+		vec->capacity *= 2;
+		vec->data = realloc(vec->data, sizeof(void *) * vec->capacity);
+	}
+	vec->data[vec->len++] = elem;
+}
 
 //divide the string pointed to by p into tokens and store them in tokens
 void tokenize(char *p)
@@ -99,7 +126,7 @@ Node *new_node_num(int val)
 Node *term();
 Node *mul();
 Node *add();
-int cousume();
+int consume();
 void error();
 
 
@@ -200,6 +227,40 @@ void gen(Node *node)
 	printf("	push rax\n");
 }
 
+//test code
+int expect(int line, int expected, int actual)
+{
+	if (expected == actual)
+		return 0;
+	fprintf(stderr, "%d: %d expected, but got %d\n",line, expected, actual);
+	exit(1);
+}
+
+void runtest()
+{
+	printf("runtest start\n");
+	Vector *vec = new_vector();
+	expect(__LINE__, 0, vec->len);
+	
+	for(int i = 0; i < 100; i++)
+		vec_push(vec, (void *)i);
+	
+	expect(__LINE__, 100, vec->len);
+	expect(__LINE__, 0,  (int)vec->data[0]);
+	expect(__LINE__, 50, (int)vec->data[50]);
+	expect(__LINE__, 99, (int)vec->data[99]);
+	
+	printf("OK\n");
+}
+
+
+/*----------------------------------------
+
+		main()
+
+-----------------------------------------*/
+
+
 int main(int argc, char **argv)
 {
 	if(argc != 2)
@@ -208,6 +269,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
+	//vector test
+	if(strcmp(argv[1], "-test") == 0)
+	{
+		runtest();
+		exit(1);
+	}
+
 	//tokenize...
 	tokenize(argv[1]);
 	Node *node = add();
