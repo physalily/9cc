@@ -8,6 +8,7 @@
 enum
 {
 	TK_NUM = 256,	//integer token
+	TK_IDENT,	//identifier
 	TK_EOF,		//express end of input(file) token
 };
 
@@ -75,6 +76,15 @@ void tokenize(char *p)
 		//skip space character
 		if(isspace(*p))
 		{
+			p++;
+			continue;
+		}
+
+		if('a' <= *p && *p <= 'z')
+		{
+			tokens[i].ty = TK_IDENT;
+			tokens[i].input = p;
+			i++;
 			p++;
 			continue;
 		}
